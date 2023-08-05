@@ -3,8 +3,9 @@ import java.rmi.registry.Registry;
 
 public class ListRegistry {
     public static void main(String[] args) {
+        String host = (args.length < 1) ? null : args[0];
         try {
-            Registry registry = LocateRegistry.getRegistry("127.0.0.1", 9100);
+            Registry registry = LocateRegistry.getRegistry(host);
             System.out.println("Searching the RMI Registry...");
             String[] boundNames = registry.list();
 
