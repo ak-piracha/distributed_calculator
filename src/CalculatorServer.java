@@ -9,11 +9,20 @@ public class CalculatorServer {
     public static void main(String args[]) {
         try {
             CalculatorImplementation obj = new CalculatorImplementation();
-            Calculator stub = (Calculator) UnicastRemoteObject.exportObject(obj, 0);
+            Calculator stub = (Calculator) UnicastRemoteObject.exportObject(obj, 9100);
+
+            Registry registry;
+            try {
+                registry = LocateRegistry.createRegistry(9100);
+                System.out.println("Java RMI registry created.");
+            } catch (RemoteException e) {
+                // If the registry is already created, fetch the existing one
+                registry = LocateRegistry.getRegistry();
+                System.out.println("Using existing RMI registry.");
+            }
 
             // Bind the remote object's stub in the registry
-            Registry registry = LocateRegistry.getRegistry();
-            registry.bind("Calculator", stub);
+            registry.rebind("Calculator", stub);
 
             System.err.println("Server ready");
         } catch (Exception e) {

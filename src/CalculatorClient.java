@@ -1,38 +1,41 @@
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Scanner;
 
 public class CalculatorClient {
     private CalculatorClient() {}
 
     public static void main(String[] args) {
-        String host = (args.length < 1) ? null : args[0];
         try {
-            Registry registry = LocateRegistry.getRegistry(host);
+            Registry registry = LocateRegistry.getRegistry("127.0.0.1", 9100);
             Calculator stub = (Calculator) registry.lookup("Calculator");
 
-            stub.pushValue(10);
-            stub.pushValue(20);
-            stub.pushValue(30);
+            Scanner scanner = new Scanner(System.in);
 
-            stub.pushOperation("min");
-            System.out.println("min: " + stub.pop());
-
-            stub.pushValue(40);
-            stub.pushValue(50);
-            stub.pushOperation("max");
-            System.out.println("max: " + stub.pop());
-
-            stub.pushValue(2);
-            stub.pushValue(3);
-            stub.pushOperation("gcd");
-            System.out.println("gcd: " + stub.pop());
-
-            stub.pushValue(15);
-            stub.pushValue(25);
-            stub.pushOperation("lcm");
-            System.out.println("lcm: " + stub.pop());
-
-            System.out.println("delayPop: " + stub.delayPop(1000));
+            while (true) {
+                System.out.println("Enter 'number', 'operation', 'pop', 'delayPop', or 'exit':");
+                String type = scanner.next();
+                if (type.equalsIgnoreCase("number")) {
+                    System.out.println("Enter a number:");
+                    int num = scanner.nextInt();
+                    stub.pushValue(num);
+                } else if (type.equalsIgnoreCase("operation")) {
+                    System.out.println("Enter an operation ('min', 'max', 'gcd', 'lcm'):");
+                    String operation = scanner.next();
+                    stub.pushOperation(operation);
+                } else if (type.equalsIgnoreCase("pop")) {
+                    System.out.println("pop: " + stub.pop());
+                } else if (type.equalsIgnoreCase("delayPop")) {
+                    System.out.println("Enter delay time in milliseconds:");
+                    int delay = scanner.nextInt();
+                    System.out.println("delayPop: " + stub.delayPop(delay));
+                } else if (type.equalsIgnoreCase("exit")) {
+                    break;
+                } else {
+                    System.out.println("Unknown input type. Try again.");
+                }
+            }
+            scanner.close();
 
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
